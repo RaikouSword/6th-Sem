@@ -11,10 +11,11 @@ class Student{
     char grade;
 
     void cal(){
+        total_mark=0;
         for(int x=0;x<5;x++){
             total_mark+=marks[x];
         }
-        percentage = (total_mark/500)*100;
+        percentage = (total_mark/500.0)*100;
         if(percentage>=95 && percentage<=100) grade = 'O';
         else if(percentage>=90 && percentage<95) grade='A';
         else if(percentage>=80 && percentage<90) grade='B';
@@ -34,19 +35,45 @@ class Student{
         }
     }
 
-    void display(int reg_no){
-        for(int x=0;x<5;x++){
-
-        }
-        cout<<"Name: "<<name<<endl;
-        for(int i=0;i<5;i++){
-            cout<<"Marks"<<"["<<i+1<<"]: "<<marks[i];
-        }
-        cout<<"Percentage: "<<percentage<<endl;
-        cout<<"Grade: "<<grade<<endl;
+    void display(){
+        cout<<"\nName: "<<name<<"\nPercentage: "<<percentage<<"%\nGrade: "<<grade<<endl;
     }
 };
 
+void topper(Student s[],int n){
+    int topperIndex = 0;
+    for (int i = 1; i < n; i++) {
+        if (s[i].percentage > s[topperIndex].percentage) {
+            topperIndex = i;
+        }
+    }
+    cout<<"\nTopper: "<<endl;
+    cout<<"Name: "<<s[topperIndex].name<<" with "<<s[topperIndex].percentage<<"%"<<endl;
+}
+
 int main(){
-    
+    int n;
+    cout << "Enter number of students: ";
+    cin >> n;
+    Student s[n];
+    for (int i = 0; i < n; i++) {
+        cout << "\nStudent " << (i + 1) << ":";
+        s[i].input();
+    }
+    int search_reg;
+    bool found = false;
+    cout<<"\nSearch Record: "<<endl;
+    cout<<"Enter registration number to search: ";
+    cin >> search_reg;
+    for (int i = 0; i < n; i++) {
+        if (s[i].reg_no == search_reg) {
+            s[i].display();
+            found = true;
+            break;
+        }
+    }
+    if (!found) cout << "Record not found!" << endl;
+    topper(s, n);
+
+    return 0;
 }
