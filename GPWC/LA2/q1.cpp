@@ -105,6 +105,7 @@ class Matrix{
             arr[2][j] = temp;
         }
     }
+    
 };
 
 int main(){
