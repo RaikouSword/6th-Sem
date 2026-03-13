@@ -64,8 +64,36 @@ int main() {
     timeBar.setFillColor(Color::Red);
     timeBar.setPosition((res.x / 2) - timeBarStartWidth / 2.0f, res.y - 100);
 
+    Texture branchTexture;
+    branchTexture.loadFromFile("Sprites/Graphics/branch.png");
+    Sprite branchSprite1, branchSprite2, branchSprite3;
+    branchSprite1.setTexture(branchTexture);
+    branchSprite2.setTexture(branchTexture);
+    branchSprite3.setTexture(branchTexture);
+    branchSprite1.setPosition(res.x/2+150,0);   
+    branchSprite2.setPosition(res.x/2+150,150); 
+    branchSprite3.setPosition(res.x/2+150,300); 
+
     float timeRemaining = 10.0f;
     float timeBarWidthPerSecond = timeBarStartWidth / timeRemaining;
+
+    Text scoreText,messageText;
+    Font font;
+    font.loadFromFile("Sprites/Font/KOMIKAP_.ttf");
+    int score =0;
+    messageText.setFont(font);
+    scoreText.setFont(font);
+    messageText.setString("Press Enter to start!");
+    scoreText.setString("Score = 0");
+    messageText.setCharacterSize(80);
+    scoreText.setCharacterSize(60);
+    messageText.setFillColor(Color::White);
+    scoreText.setFillColor(Color::Red);
+
+    FloatRect textRect = messageText.getLocalBounds();
+    messageText.setOrigin(textRect.left + textRect.width / 2.0f,textRect.top + textRect.height / 2.0f);
+    messageText.setPosition(res.x / 2.0f, res.y / 2.0f);
+    scoreText.setPosition(20, 20);
 
     Clock clock;
     bool paused = true;
@@ -75,22 +103,47 @@ int main() {
         Event event;
         while (rm.pollEvent(event)) {
             if (event.type == Event::Closed) rm.close();
+            if(event.type==Event::KeyPressed && event.key.code==Keyboard::Enter){
+                paused=!paused;
+                timeRemaining=9.0f;
+            }
+            if(event.type==Event::KeyPressed && event.key.code==Keyboard::Right){
+                score++;
+                if(score==101){
+                    paused = true;
+                    messageText.setString("Winner");
+                    textRect=messageText.getLocalBounds();
+                    messageText.setOrigin(textRect.left+textRect.width/2.0,textRect.top+textRect.height/2.0);
+                    messageText.setPosition(res.x/2.0,res.y/2.0);
+                }
+            }
+            if(event.type==Event::KeyPressed && event.key.code==Keyboard::Left){
+                if(score>0){
+                    score--;
+                }
+            }
         }
 
         // Input
         if (Keyboard::isKeyPressed(Keyboard::Escape)) rm.close();
         
-        if (Keyboard::isKeyPressed(Keyboard::Return)) {
-            paused = false;
-            timeRemaining=9.0f;
-        }
+        // if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+        //     paused = !paused;
+        //     timeRemaining=9.0f;
+        // }
 
         if (!paused) {
             Time dt = clock.restart();
             // Time Bar Update
             timeRemaining -= dt.asSeconds();
             timeBar.setSize(Vector2f(timeBarWidthPerSecond * timeRemaining, timeBarHeight));
-            if (timeRemaining <= 0) paused = true;
+            if (timeRemaining <= 0.0) {
+                paused = true;
+                messageText.setString("Time Out!!");
+                textRect=messageText.getLocalBounds();
+                messageText.setOrigin(textRect.left+textRect.width/2.0,textRect.top+textRect.height/2.0);
+                messageText.setPosition(res.x/2.0,res.y/2.0);
+            }
             // Bee Logic
             if (!beeActive1) {
                 beeSpeed1 = (rand() % 200) + 200;
@@ -140,6 +193,15 @@ int main() {
                 cloudSprite3.move(cloudSpeed3 * dt.asSeconds(), 0);
                 if (cloudSprite3.getPosition().x > res.x) cloudActive3 = false;
             }
+            
+            //test updation of score with left and right arrow
+            // if(Keyboard::isKeyPressed(Keyboard::Left)||Keyboard::isKeyPressed(Keyboard::Right)){
+            //     score++;
+            // }
+
+            std::stringstream ss;
+            ss<< "Score = " << score;
+            scoreText.setString(ss.str());
 
         } 
 
@@ -150,8 +212,17 @@ int main() {
         rm.draw(cloudSprite2);
         rm.draw(cloudSprite3);
         rm.draw(treeSprite);
+        if(!paused){
+            rm.draw(branchSprite1);
+            rm.draw(branchSprite2);
+            rm.draw(branchSprite3);
+        }
         rm.draw(beeSprite1);
         rm.draw(timeBar);
+        rm.draw(scoreText);
+        if(paused){
+            rm.draw(messageText);
+        }
         // rm.draw(playerSprite);
         rm.display();
     }

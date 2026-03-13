@@ -1,5 +1,6 @@
 #include <sstream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 using namespace sf;
 
 const int NUM_BRANCHES = 6;
@@ -171,13 +172,11 @@ int main(){
     updateBranches(5);
 
     while (rm.isOpen()){
-        Event event;rm.draw(messageText);
-        if(paused){
-            rm.draw(messageText);
-        }
+        Event event;
         while (rm.pollEvent(event)){
-            if (event.type == Event::Closed){
-                rm.close();
+            if (event.type == Event::KeyReleased && !paused){
+                acceptInput=true;
+                axeSprite.setPosition(2000,axeSprite.getPosition().y);
             }
         }
 
@@ -188,6 +187,45 @@ int main(){
             paused = false;
             score = 0;
             timeRemaining = 9.0f;
+
+            for (int i = 1; i < NUM_BRANCHES; i++){
+                branchPositions[i] = side::NONE;
+            }
+
+            graveSprite.setPosition(675, 2000);
+            playerSprite.setPosition(480, res.y - 330);
+
+            acceptInput = true;
+        }
+        if(acceptInput){
+            if (Keyboard::isKeyPressed(Keyboard::Right)){
+                playerSide = side::RIGHT;
+                score ++;
+                timeRemaining += (2 / score) + .15;
+                axeSprite.setPosition(AXE_POSITION_RIGHT,axeSprite.getPosition().y);
+                playerSprite.setPosition(1000, res.y - 330);
+                updateBranches(score);
+                logSprite.setPosition(810, 720);
+                logSpeedX = -5000;
+                logActive = true;
+                acceptInput=false;
+                SoundBuffer chopBuffer;
+                chopBuffer.loadFromFile("Graphics/Sounds/chop.wav");
+                Sound chop;
+                chop.setBuffer(chopBuffer);
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Left)){
+                playerSide = side::LEFT;
+                score++;
+                timeRemaining += (2 / score) + .15;
+                axeSprite.setPosition(AXE_POSITION_LEFT,axeSprite.getPosition().y);
+                playerSprite.setPosition(480, res.y - 330);
+                updateBranches(score);
+                logSprite.setPosition(810, 720);
+                logSpeedX = -5000;
+                logActive = true;
+                acceptInput=false;
+            }
         }
         if (!paused){
             Time dt = clock.restart();
@@ -314,12 +352,38 @@ int main(){
                     branches[i].setPosition(1330, height); //Move to right
                     branches[i].setRotation(0); //Set to normal
                 }else{
-                    branches[i].setPosition(3000, height);
+                    branches[i].setPosition(3000, height); //Hide the branches
                 }
+            }
+            //Flying log
+            if(logActive){
+                logSprite.setPosition(
+                    logSprite.getPosition().x +(logSpeedX * dt.asSeconds()),
+                    logSprite.getPosition().y +(logSpeedY * dt.asSeconds())
+                );
+                if(logSprite.getPosition().x<-100 || logSprite.getPosition().x>2000){
+                    logActive = false;
+                    logSprite.setPosition(810, 720);
+                }
+            }
+            //death
+            if(branchPositions[5]==playerSide){
+                paused=true;
+                acceptInput = false;
+                graveSprite.setPosition(525, 760);
+                playerSprite.setPosition(2000,660);
+                messageText.setString("SQUISHED!!");
+                FloatRect textRect = messageText.getLocalBounds();
+                messageText.setOrigin(textRect.left +textRect.width / 2.0f,textRect.top + textRect.height / 2.0f);
+                messageText.setPosition(res.x/ 2.0f,res.y/ 2.0f);
+                SoundBuffer deathBuffer;
+                deathBuffer.loadFromFile("Graphics/Sounds/death.wav");
+                Sound death;
+                death.setBuffer(deathBuffer);
             }
 
         }
-
+        
         rm.clear();
 
         rm.draw(bgSprite);
@@ -343,7 +407,6 @@ int main(){
         if(paused){
             rm.draw(messageText);
         }
-
         rm.display();
     }
 }
