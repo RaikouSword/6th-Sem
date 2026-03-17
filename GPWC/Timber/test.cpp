@@ -126,6 +126,8 @@ int main() {
       if (event.type == Event::KeyPressed &&
           event.key.code == Keyboard::Right) {
         score++;
+        playerSide = side::RIGHT;
+        playerSprite.setPosition(950+30,res.y-330);
         if (score == 101) {
           paused = true;
           messageText.setString("Winner");
@@ -138,6 +140,8 @@ int main() {
       if (event.type == Event::KeyPressed && event.key.code == Keyboard::Left) {
         if (score > 0) {
           score--;
+          playerSide = side::LEFT;
+          playerSprite.setPosition(480,res.y-330);
         }
       }
     }
