@@ -1,6 +1,5 @@
 #include <sstream>
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
 using namespace sf;
 
 const int NUM_BRANCHES = 6;
@@ -109,13 +108,13 @@ int main()
     graveTexture.loadFromFile("Sprites/Graphics/rip.png");
     Sprite graveSprite;
     graveSprite.setTexture(graveTexture);
-    graveSprite.setPosition(500, res.y - 300);
+    graveSprite.setPosition(480, res.y - 300);
     
     Texture axeTexture;
     axeTexture.loadFromFile("Sprites/Graphics/axe.png");
     Sprite axeSprite;
     axeSprite.setTexture(axeTexture);
-    axeSprite.setPosition(600, res.y - 310);
+    axeSprite.setPosition(600, res.y - 220);
 
     const float AXE_POSITION_LEFT = 650;
     const float AXE_POSITION_RIGHT = 950;
@@ -124,26 +123,15 @@ int main()
     logTexture.loadFromFile("Sprites/Graphics/log.png");
     Sprite logSprite;
     logSprite.setTexture(logTexture);
-    logSprite.setPosition(710, res.y - 330);
+    logSprite.setPosition(650, res.y - 330);
 
     bool logActive = false;
     float logSpeedX = 1000;
     float logSpeedY = -1500;
 
     bool acceptInput = false;
+
     //Prepare the sounds
-    SoundBuffer chopBuffer;
-    chopBuffer.loadFromFile("Sprites/Sounds/chop.wav");
-    Sound chop;
-    chop.setBuffer(chopBuffer);
-    SoundBuffer deathBuffer;
-    deathBuffer.loadFromFile("Sprites/Sounds/death.wav");
-    Sound death;
-    death.setBuffer(deathBuffer);
-    SoundBuffer ootBuffer;
-    ootBuffer.loadFromFile("Sprites/Sounds/out_of_time.wav");
-    Sound outOfTime;
-    outOfTime.setBuffer(ootBuffer);
 
     Clock clock;
     // Time bar
@@ -153,7 +141,6 @@ int main()
     timeBar.setSize(Vector2f(timeBarStartWidth, timeBarHeight));
     timeBar.setFillColor(Color::Red);
     timeBar.setPosition((res.x / 2) - timeBarStartWidth / 2.0, res.y - 100);
-    Time gameTimeTotal;
     float timeRemaining = 10.0f;
     float timeBarWidthPerSecond = timeBarStartWidth / timeRemaining;
 
@@ -239,7 +226,6 @@ int main()
                 logSpeedX = -5000;
                 logActive = true;
                 acceptInput = false;
-                chop.play();
             }
             if (Keyboard::isKeyPressed(Keyboard::Left))
             {
@@ -270,7 +256,6 @@ int main()
                 FloatRect textRect = messageText.getLocalBounds();
                 messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
                 messageText.setPosition(res.x / 2.0f, res.y / 2.0f);
-                outOfTime.play();
             }
 
             // Bee animation
@@ -400,12 +385,12 @@ int main()
                 float height = i * 150;
                 if (branchPositions[i] == side::LEFT)
                 {
-                    branches[i].setPosition(610, height); // Move to left
+                    branches[i].setPosition(650-220, height); // Move to left
                     branches[i].setRotation(180);         // Flip the other way
                 }
                 else if (branchPositions[i] == side::RIGHT)
                 {
-                    branches[i].setPosition(1330, height); // Move to right
+                    branches[i].setPosition(950+220, height); // Move to right
                     branches[i].setRotation(0);            // Set to normal
                 }
                 else
@@ -436,7 +421,6 @@ int main()
                 FloatRect textRect = messageText.getLocalBounds();
                 messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
                 messageText.setPosition(res.x / 2.0f, res.y / 2.0f);
-                death.play();
             }
         }
 
@@ -464,6 +448,7 @@ int main()
         if (paused)
         {
             rm.draw(messageText);
+            
         }
         rm.display();
     }
