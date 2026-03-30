@@ -21,11 +21,15 @@ float Ball::getXVelocity(){
 }
 
 void Ball::reboundSides(){
-    ball_dirX = -ball_dirX;
+    ball_dirX = - ball_dirX;
 }
 
 void Ball::reboundBatOrTop(){
     ball_dirY = -ball_dirY;
+}
+
+void Ball::speed(){
+    ball_speed+=1.10*ball_speed;
 }
 
 void Ball::reboundBottom(){

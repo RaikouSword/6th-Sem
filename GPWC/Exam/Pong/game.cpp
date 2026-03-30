@@ -54,6 +54,19 @@ int main(){
         }else{
             bat.stopRight();
         }
+        if(Keyboard::isKeyPressed(Keyboard::Up)){
+            if(bat.getPosition().top<=0) bat.stopUp();
+            else bat.moveUp();
+        }else{
+            bat.stopUp();
+        }
+        if(Keyboard::isKeyPressed(Keyboard::Down)){
+            if(bat.getPosition().top+bat.getPosition().height>=res.y) bat.stopDown();
+            else bat.moveDown();
+        }else{
+            bat.stopDown();
+        }
+
 
         // Delta time updation
         Time dt = clock.restart();
@@ -90,6 +103,7 @@ int main(){
             ball.reboundBatOrTop();
             ball.update(dt);
             bat.update(dt);
+            // ball.speed();
         }
 
         //Draw
